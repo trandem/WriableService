@@ -11,10 +11,15 @@ import com.example.user.request.impl.WithDrawRequest;
 import com.example.user.response.impl.QueryResponse;
 import com.example.user.response.impl.WithDrawResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -66,4 +71,22 @@ public class SimpleHttp {
         }
         return user;
     }
+    @GetMapping("/test")
+    public String test() {
+        return "successful";
+    }
+
+    @GetMapping(value = "/gophertiles_files/{name}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<ByteArrayResource> getImage(@PathVariable String name) throws IOException, InterruptedException {
+        Thread.sleep(100);
+        final ByteArrayResource inputStream = new ByteArrayResource(Files.readAllBytes(Paths.get(
+                "image/" + name
+        )));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentLength(inputStream.contentLength())
+                .body(inputStream);
+
+    }
+
 }
